@@ -6,18 +6,11 @@ interface GestureListProps {
   gestures: GestureTemplate[];
   selectedGesture: string | null;
   onSelect: (name: string) => void;
+  onDelete: (name: string) => void;
+  onAdd: () => void;
 }
 
-export function GestureList({ gestures, selectedGesture, onSelect }: GestureListProps) {
-  if (gestures.length === 0) {
-    return (
-      <div className="gesture-list-empty">
-        <p>登録されたジェスチャーはありません</p>
-        <p className="hint">「追加」ボタンをクリックして新しいジェスチャーを作成してください</p>
-      </div>
-    );
-  }
-
+export function GestureList({ gestures, selectedGesture, onSelect, onDelete, onAdd }: GestureListProps) {
   return (
     <div className="gesture-list">
       {gestures.map((gesture) => (
@@ -26,6 +19,16 @@ export function GestureList({ gestures, selectedGesture, onSelect }: GestureList
           className={`gesture-item ${selectedGesture === gesture.name ? "selected" : ""}`}
           onClick={() => onSelect(gesture.name)}
         >
+          <button
+            className="delete-button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(gesture.name);
+            }}
+            aria-label="削除"
+          >
+            ×
+          </button>
           <GestureCanvas
             points={gesture.points}
             width={80}
@@ -35,6 +38,9 @@ export function GestureList({ gestures, selectedGesture, onSelect }: GestureList
           <span className="gesture-name">{gesture.name}</span>
         </div>
       ))}
+      <div className="gesture-item add-gesture-item" onClick={onAdd}>
+        <span className="plus-icon">+</span>
+      </div>
     </div>
   );
 }

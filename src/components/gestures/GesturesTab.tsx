@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { Button } from "../common/Button";
 import { ConfirmDialog } from "../common/Dialog";
 import { GestureList } from "./GestureList";
 import { GestureEditor } from "./GestureEditor";
-import { GestureCanvas } from "../common/GestureCanvas";
 import { useStore } from "../../store/useStore";
 import * as api from "../../api/commands";
 import "./GesturesTab.css";
@@ -32,11 +30,10 @@ export function GesturesTab() {
     setIsEditing(true);
   };
 
-  const handleEdit = () => {
-    if (selectedGesture) {
-      setIsNew(false);
-      setIsEditing(true);
-    }
+  const handleSelect = (name: string) => {
+    setSelectedGesture(name);
+    setIsNew(false);
+    setIsEditing(true);
   };
 
   const handleSave = async (name: string, points: [number, number][]) => {
@@ -68,21 +65,22 @@ export function GesturesTab() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedGesture) return;
+  const handleDelete = async (name: string) => {
     setError(null);
     try {
-      const oldData = gestures.find((g) => g.name === selectedGesture);
-      await api.deleteGesture(selectedGesture);
-      deleteGesture(selectedGesture);
+      const oldData = gestures.find((g) => g.name === name);
+      await api.deleteGesture(name);
+      deleteGesture(name);
       pushHistory({
         type: "gesture",
         action: "delete",
-        data: { name: selectedGesture },
+        data: { name },
         previousData: oldData,
       });
-      setShowDeleteConfirm(false);
-      setIsEditing(false);
+      if (selectedGesture === name) {
+        setSelectedGesture(null);
+        setIsEditing(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -102,7 +100,9 @@ export function GesturesTab() {
           <GestureList
             gestures={gestures}
             selectedGesture={selectedGesture}
-            onSelect={setSelectedGesture}
+            onSelect={handleSelect}
+            onDelete={handleDelete}
+            onAdd={handleAdd}
           />
         </div>
 
@@ -115,44 +115,12 @@ export function GesturesTab() {
               onDelete={() => setShowDeleteConfirm(true)}
               onCancel={handleCancel}
             />
-          ) : selectedGestureData ? (
-            <div className="gesture-preview">
-              <h3>{selectedGestureData.name}</h3>
-              <div className="preview-canvas">
-                <GestureCanvas
-                  points={selectedGestureData.points}
-                  width={250}
-                  height={250}
-                  strokeWidth={3}
-                />
-              </div>
-            </div>
           ) : (
             <div className="gesture-placeholder">
-              <p>ジェスチャーを選択するか、「追加」ボタンで新規作成してください</p>
+              <p>ジェスチャーを選択して編集するか、プラスボタンで新規作成してください</p>
             </div>
           )}
         </div>
-      </div>
-
-      <div className="gestures-footer">
-        <Button variant="primary" onClick={handleAdd}>
-          追加
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={handleEdit}
-          disabled={!selectedGesture}
-        >
-          編集
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => setShowDeleteConfirm(true)}
-          disabled={!selectedGesture}
-        >
-          削除
-        </Button>
       </div>
 
       <ConfirmDialog
@@ -161,7 +129,12 @@ export function GesturesTab() {
         message={`「${selectedGesture}」を削除しますか？この操作は取り消せません。`}
         confirmLabel="削除"
         variant="danger"
-        onConfirm={handleDelete}
+        onConfirm={async () => {
+          if (selectedGesture) {
+            await handleDelete(selectedGesture);
+          }
+          setShowDeleteConfirm(false);
+        }}
         onCancel={() => setShowDeleteConfirm(false)}
       />
     </div>

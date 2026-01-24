@@ -7,6 +7,8 @@ interface ActionListProps {
   gestures: GestureTemplate[];
   selectedAction: string | null;
   onSelect: (gesture: string) => void;
+  onDelete: (gesture: string) => void;
+  onAdd: () => void;
 }
 
 const actionTypeLabels: Record<string, string> = {
@@ -26,15 +28,7 @@ const wheelTriggerLabels: Record<WheelTrigger, string> = {
   leftclick_wheel_down: "左クリック+ホイールダウン",
 };
 
-export function ActionList({ actions, gestures, selectedAction, onSelect }: ActionListProps) {
-  if (actions.length === 0) {
-    return (
-      <div className="action-list-empty">
-        <p>登録されたアクションはありません</p>
-        <p className="hint">「追加」ボタンをクリックして新しいアクションを作成してください</p>
-      </div>
-    );
-  }
+export function ActionList({ actions, gestures, selectedAction, onSelect, onDelete, onAdd }: ActionListProps) {
 
   const getGesturePoints = (gestureName: string): [number, number][] => {
     const gesture = gestures.find((g) => g.name === gestureName);
@@ -92,6 +86,16 @@ export function ActionList({ actions, gestures, selectedAction, onSelect }: Acti
             className={`action-item ${selectedAction === actionKey ? "selected" : ""}`}
             onClick={() => onSelect(actionKey)}
           >
+            <button
+              className="delete-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(actionKey);
+              }}
+              aria-label="削除"
+            >
+              ×
+            </button>
             <div className="action-col-name">
               {action.name && action.name.trim() ? action.name : "無し"}
             </div>
@@ -118,6 +122,13 @@ export function ActionList({ actions, gestures, selectedAction, onSelect }: Acti
           </div>
         );
       })}
+      <div className="action-item add-action-item" onClick={onAdd}>
+        <div className="action-col-name"></div>
+        <div className="action-col-trigger">
+          <span className="plus-icon">+</span>
+        </div>
+        <div className="action-col-action"></div>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "../common/Button";
 import { ConfirmDialog } from "../common/Dialog";
 import { ActionList } from "./ActionList";
 import { ActionEditor } from "./ActionEditor";
@@ -84,21 +83,22 @@ export function ActionsTab() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedAction) return;
+  const handleDelete = async (actionKey: string) => {
     setError(null);
     try {
-      const oldData = actions.find((a) => getActionKey(a) === selectedAction);
-      await api.deleteAction(selectedAction);
-      deleteAction(selectedAction);
+      const oldData = actions.find((a) => getActionKey(a) === actionKey);
+      await api.deleteAction(actionKey);
+      deleteAction(actionKey);
       pushHistory({
         type: "action",
         action: "delete",
-        data: { gesture: selectedAction },
+        data: { gesture: actionKey },
         previousData: oldData,
       });
-      setShowDeleteConfirm(false);
-      setSelectedAction(null);
+      if (selectedAction === actionKey) {
+        setSelectedAction(null);
+        setIsNew(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
@@ -115,6 +115,8 @@ export function ActionsTab() {
             gestures={gestures}
             selectedAction={selectedAction}
             onSelect={handleSelect}
+            onDelete={handleDelete}
+            onAdd={handleAdd}
           />
         </div>
 
@@ -129,23 +131,10 @@ export function ActionsTab() {
             />
           ) : (
             <div className="action-placeholder">
-              <p>アクションを選択するか、「追加」ボタンで新規作成してください</p>
+              <p>アクションを選択して編集するか、プラスボタンで新規作成してください</p>
             </div>
           )}
         </div>
-      </div>
-
-      <div className="actions-footer">
-        <Button variant="primary" onClick={handleAdd}>
-          追加
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => setShowDeleteConfirm(true)}
-          disabled={!selectedAction}
-        >
-          削除
-        </Button>
       </div>
 
       <ConfirmDialog
@@ -154,7 +143,12 @@ export function ActionsTab() {
         message={`「${selectedAction}」のアクションを削除しますか？`}
         confirmLabel="削除"
         variant="danger"
-        onConfirm={handleDelete}
+        onConfirm={async () => {
+          if (selectedAction) {
+            await handleDelete(selectedAction);
+          }
+          setShowDeleteConfirm(false);
+        }}
         onCancel={() => setShowDeleteConfirm(false)}
       />
     </div>
