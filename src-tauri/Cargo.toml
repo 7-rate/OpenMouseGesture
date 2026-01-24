@@ -1,6 +1,6 @@
 [package]
 name = "openmousegesture"
-version = "1.0.0"
+version = "1.0.1"
 description = "Open Mouse Gesture"
 authors = ["7-rate"]
 edition = "2021"
