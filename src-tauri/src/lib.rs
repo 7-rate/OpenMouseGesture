@@ -201,11 +201,28 @@ fn add_action(action: Action) -> Result<(), String> {
     let manager = ConfigManager::new()?;
     let mut config = manager.load_config()?;
 
-    if config.actions.iter().any(|a| a.gesture == action.gesture) {
-        return Err(format!(
-            "Action for gesture '{}' already exists",
-            action.gesture
-        ));
+    let duplicate = config.actions.iter().any(|a| {
+        if action.trigger_type == "wheel" && a.trigger_type == "wheel" {
+            a.wheel_trigger == action.wheel_trigger
+        } else if action.trigger_type == "gesture" && a.trigger_type == "gesture" {
+            a.gesture == action.gesture
+        } else {
+            false
+        }
+    });
+
+    if duplicate {
+        if action.trigger_type == "wheel" {
+            return Err(format!(
+                "Action for wheel trigger '{:?}' already exists",
+                action.wheel_trigger
+            ));
+        } else {
+            return Err(format!(
+                "Action for gesture '{}' already exists",
+                action.gesture
+            ));
+        }
     }
 
     config.actions.push(action);
