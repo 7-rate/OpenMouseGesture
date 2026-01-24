@@ -2,8 +2,6 @@
 
 [![CI](https://github.com/7-rate/OpenMouseGesture/actions/workflows/ci.yml/badge.svg)](https://github.com/7-rate/OpenMouseGesture/actions/workflows/ci.yml)
 
-Windows向けの軽量マウスジェスチャーアプリケーション
-
 ## プロジェクト概要
 
 OpenMouseGestureは、Windowsで動作する高性能なマウスジェスチャーアプリケーションです。
@@ -14,6 +12,10 @@ OpenMouseGestureは、Windowsで動作する高性能なマウスジェスチャ
 - **高度にカスタマイズ可能**: JSON形式でジェスチャーとアクションを自由に設定
 - **豊富なアクションサポート**: キーストローク送信、アプリケーション起動、ウィンドウ操作、URLオープンなど
 - **クリーンな配布**: OS環境やレジストリを汚さないZIP配布形式
+
+## スクリーンショット
+![ジェスチャー登録画面](docs/images/register_gesture.png)
+![アクション登録画面](docs/images/actions.png)
 
 ## 機能一覧
 
@@ -29,20 +31,11 @@ OpenMouseGestureは、Windowsで動作する高性能なマウスジェスチャ
 - **URL オープン**: デフォルトブラウザでURLを開く
 - **ウィンドウ操作**: ウィンドウの最小化、最大化、閉じる、etc.
 
-### プリセット例
-- ジェスチャー無し + ホイール → タブ切替（Ctrl+Tab / Ctrl+Shift+Tab）
-- ジェスチャー無し + 左クリック+ホイール → 音量調整
-- ジェスチャー無し + ホイールクリック → メディア再生/一時停止
-
 ## インストール手順
 1. Releasesから最新のZIPファイルをダウンロード
 2. 任意のフォルダに解凍
 3. `OpenMouseGesture.exe`を実行
 
-
-## スクリーンショット
-![ジェスチャー登録画面](docs/images/register_gesture.png)
-![アクション登録画面](docs/images/actions.png)
 
 ## スタートアップ登録方法
 
@@ -79,15 +72,15 @@ Windowsの起動時に自動実行するには：
    - C++によるデスクトップ開発をインストール
 
 2. **Node.js/Rustをインストール**
-```powershell
-winget install -e --id OpenJS.NodeJS.LTS
-winget install rustlang.rustup
-```
+   ```powershell
+   winget install -e --id OpenJS.NodeJS.LTS
+   winget install rustlang.rustup
+   ```
 
 3. **リポジトリをクローン**
-```git
-git clone https://github.com/7-rate/OpenMouseGesture.git
-```
+   ```git
+   git clone https://github.com/7-rate/OpenMouseGesture.git
+   ```
 
 4. **依存関係をインストール**
    ```bash
@@ -113,8 +106,6 @@ npx tauri dev
 npx tauri build
 ```
 生成物は`src-tauri/target/release/`配下に出力されます。
-
-**注意**: ビルド時にcargo-aboutがインストールされていない場合、サードパーティライセンス情報は生成されませんが、ビルド自体は成功します。
 
 ### 設定ファイル(config.json/gestures.json)の構造
 
